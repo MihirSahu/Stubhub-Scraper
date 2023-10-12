@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import requests
 
 # Set up the headless browser
 chrome_options = Options()
@@ -21,9 +22,17 @@ soup = BeautifulSoup(html, 'lxml')
 divs = soup.find_all('div', class_='sc-fMtJSh BovtL')
 
 # Loop through the divs and do something with them
+prices = []
 for div in divs:
-    # Do something with the div
-    print(div.text)
+    prices.append(int((div.text)[1:]))
+
+acceptable_prices_string = ''
+for price in prices:
+    print(price)
+    if price < 400:
+        acceptable_prices_string += str(price) + '\n'
+
+requests.post('http://129.146.208.177/test', data=acceptable_prices_string)
 
 # Quit the browser
 driver.quit()
