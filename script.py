@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import requests
 
@@ -7,7 +8,8 @@ import requests
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
-driver = webdriver.Chrome(options=chrome_options)
+service = service = Service(executable_path='/usr/bin/chromedriver')
+driver = webdriver.Chrome(options=chrome_options, service=service)
 
 # Navigate to the website
 one_ticket_url = 'https://www.stubhub.com/olivia-rodrigo-houston-tickets-2-27-2024/event/152301318/?quantity=1&priceOption=1%2C270%2C8999.1&listingId=&listingQty='
