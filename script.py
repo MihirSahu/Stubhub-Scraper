@@ -18,19 +18,31 @@ driver.get(two_ticket_url)
 html = driver.page_source
 soup = BeautifulSoup(html, 'lxml')
 
-# Find all div elements in the HTML document
-divs = soup.find_all('div', class_='sc-fMtJSh BovtL')
+stubhub_event_details_tag = soup.find(id='stubhub-event-detail-listings-grid')
+event_details_tags = stubhub_event_details_tag.find_all(recursive=False)[0]
+event_details_tags_2 = event_details_tags.find_all(recursive=False)[:-3]
 
-# Loop through the divs and do something with them
-prices = []
-for div in divs:
-    prices.append(int((div.text)[1:]))
+sections_prices = []
+restricted_sections = ['401', '402', '403', '404', '405', '406', '407', '408', '428', '429', '430', '431', '432', '433', '434', '101', '102', '103', '104', '105', '122', '123', '124', '125', '126']
+
+for div in event_details_tags_2:
+    try:
+        text = div.find_all(recursive=False)[0].find_all(recursive=False)[0].find_all(recursive=False)[0].text
+        section = text[text.find('Section') + 8:text.find('|') - 1]
+        # Check that sections aren't sections 401-408, 428-434, 101-105, or 122-126
+        if section in restricted_sections:
+            continue
+        price = text[text.find('$') + 1:text.find('each')]
+        sections_prices.append([section, price])
+        # print("Section " + section + " costs " + price + " each")
+    except Exception as e:
+        # print(e)
+        continue
 
 acceptable_prices_string = ''
-for price in prices:
-    print(price)
-    if price < 400:
-        acceptable_prices_string += str(price) + '\n'
+for idx, section_price in enumerate(sections_prices):
+    if int(section_price[1]) < 300:
+        acceptable_prices_string += "Section " + section_price[0] + " is available for $" + section_price[1] + " each" + '\n'
 
 requests.post('http://129.146.208.177/test', data=acceptable_prices_string)
 
